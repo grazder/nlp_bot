@@ -1,7 +1,6 @@
 from TelegramBot import TelegramBot
 
-BOT_TOKEN = "1864955125:AAHolvS42alOUd4V-4HT6r6-dhyelNLGjZU"
-
+BOT_TOKEN = "TELEGRAM_TOKEN"
 
 def main() -> None:
     bot = TelegramBot(BOT_TOKEN)
