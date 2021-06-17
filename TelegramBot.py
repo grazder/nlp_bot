@@ -10,7 +10,7 @@ from telegram.ext import (
 )
 import logging
 from typing import Dict, List
-from handlers import StartHandler, EndHandler, UnknownHandler
+from handlers import StartHandler, EndHandler, UnknownHandler, SentimentHandler
 
 # Enable logging
 logging.basicConfig(

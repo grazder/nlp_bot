@@ -4,6 +4,8 @@ from telegram import Update
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters
 from insult_detection import SentimentAnalysis
 
+from deeppavlov import build_model, configs
+
 
 class SuperHandler:
     """
@@ -12,7 +14,6 @@ class SuperHandler:
     def __init__(self):
         self.__logger = logging.getLogger(__file__)
         self.__analyser = SentimentAnalysis()
-        self.__bad_message = 'Давай повежливей...'
 
     @property
     def handler_name(self) -> str:
@@ -26,17 +27,11 @@ class SuperHandler:
             self.__logger.error(f"Can't find source chat for {self.handler_name}")
             return
 
-        sentiment = self.__analyser.get_sentiment(update.message.text)
         self.__logger.info(
-            f"Get {self.handler_name} from {update.effective_chat.id} ({update.effective_chat.username}. Sentiment: {sentiment})"
+            f"Get {self.handler_name} from {update.effective_chat.id} ({update.effective_chat.username})"
         )
 
-        # Check if there is no insults
-
-        if sentiment == 'negative':
-            callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__bad_message)
-        else:
-            self._run_handler(update, callback_context)
+        self._run_handler(update, callback_context)
 
     def create(self) -> Handler:
         raise NotImplementedError()
@@ -101,3 +96,25 @@ class UnknownHandler(SuperHandler):
 
     def create(self) -> Handler:
         return MessageHandler(Filters.regex(r'.*'), self._run_wrapper)
+
+
+class SentimentHandler(SuperHandler):
+    """
+    Handler for toxic messages
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.__message = 'Давай повежливее...'
+        model = build_model(configs.classifiers.rusentiment_bert, download=False)
+        self.__filter = SentimentAnalysis(model)
+
+    @property
+    def handler_name(self) -> str:
+        return 'toxic'
+
+    def _run_handler(self, update: Update, callback_context: CallbackContext):
+        callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
+
+    def create(self) -> Handler:
+        return MessageHandler(self.filter, self._run_wrapper)

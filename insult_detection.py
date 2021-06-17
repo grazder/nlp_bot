@@ -1,9 +1,14 @@
 from deeppavlov import build_model, configs
+from telegram.ext.filters import MessageFilter
 
 
-class SentimentAnalysis:
-    def __init__(self):
-        self.__model = build_model(configs.classifiers.rusentiment_bert, download=False)
+class SentimentFilter(MessageFilter):
+    def __init__(self, model):
+        self.__model = model
+        self.name = 'Sentiment Filter'
 
-    def get_sentiment(self, sentence):
-        return self.__model([sentence])[0]
+    def filter(self, message):
+        if message.text is not None:
+            return self.__model([message.text])[0] == 'negative'
+
+        return False
