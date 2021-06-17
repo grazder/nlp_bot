@@ -2,7 +2,7 @@ import logging
 
 from telegram import Update
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters
-from insult_detection import SentimentFilter
+from filters import SentimentFilter
 
 from deeppavlov import build_model, configs
 
