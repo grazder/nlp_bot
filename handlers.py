@@ -116,4 +116,4 @@ class SentimentHandler(SuperHandler):
         callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
 
     def create(self) -> Handler:
-        return MessageHandler(self.filter, self._run_wrapper)
+        return MessageHandler(self.__filter, self._run_wrapper)
