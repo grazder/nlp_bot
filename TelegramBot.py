@@ -33,6 +33,7 @@ class TelegramBot:
         return [
             StartHandler().create(),
             EndHandler().create(),
+            SentimentHandler().create(),
             UnknownHandler().create(),
         ]
 

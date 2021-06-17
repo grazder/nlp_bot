@@ -2,7 +2,7 @@ import logging
 
 from telegram import Update
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters
-from insult_detection import SentimentAnalysis
+from insult_detection import SentimentFilter
 
 from deeppavlov import build_model, configs
 
@@ -13,7 +13,6 @@ class SuperHandler:
     """
     def __init__(self):
         self.__logger = logging.getLogger(__file__)
-        self.__analyser = SentimentAnalysis()
 
     @property
     def handler_name(self) -> str:
@@ -107,11 +106,11 @@ class SentimentHandler(SuperHandler):
 
         self.__message = 'Давай повежливее...'
         model = build_model(configs.classifiers.rusentiment_bert, download=False)
-        self.__filter = SentimentAnalysis(model)
+        self.__filter = SentimentFilter(model)
 
     @property
     def handler_name(self) -> str:
-        return 'toxic'
+        return 'sentiment'
 
     def _run_handler(self, update: Update, callback_context: CallbackContext):
         callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
