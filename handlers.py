@@ -1,7 +1,8 @@
 import logging
 
 from telegram import Update
-from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler
+from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters
+from insult_detection import SentimentAnalysis
 
 
 class SuperHandler:
@@ -10,6 +11,8 @@ class SuperHandler:
     """
     def __init__(self):
         self.__logger = logging.getLogger(__file__)
+        self.__analyser = SentimentAnalysis()
+        self.__bad_message = 'Давай повежливей...'
 
     @property
     def handler_name(self) -> str:
@@ -22,10 +25,18 @@ class SuperHandler:
         if update.effective_chat is None:
             self.__logger.error(f"Can't find source chat for {self.handler_name}")
             return
+
+        sentiment = self.__analyser.get_sentiment(update.message.text)
         self.__logger.info(
-            f"Get {self.handler_name} from {update.effective_chat.id} ({update.effective_chat.username})"
+            f"Get {self.handler_name} from {update.effective_chat.id} ({update.effective_chat.username}. Sentiment: {sentiment})"
         )
-        self._run_handler(update, callback_context)
+
+        # Check if there is no insults
+
+        if sentiment == 'negative':
+            callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__bad_message)
+        else:
+            self._run_handler(update, callback_context)
 
     def create(self) -> Handler:
         raise NotImplementedError()
@@ -89,4 +100,4 @@ class UnknownHandler(SuperHandler):
         callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
 
     def create(self) -> Handler:
-        return RegexHandler(r'.*', self._run_wrapper)
+        return MessageHandler(Filters.regex(r'.*'), self._run_wrapper)
