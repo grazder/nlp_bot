@@ -10,7 +10,7 @@ from telegram.ext import (
 )
 import logging
 from typing import Dict, List
-from handlers import StartHandler, EndHandler, UnknownHandler, SentimentHandler
+from handlers import StartHandler, EndHandler, UnknownHandler, SentimentHandler, MainMessageHandler
 
 # Enable logging
 logging.basicConfig(
@@ -33,8 +33,9 @@ class TelegramBot:
         return [
             StartHandler().create(),
             EndHandler().create(),
-            SentimentHandler().create(),
-            UnknownHandler().create(),
+#            SentimentHandler().create(),
+            MainMessageHandler().create(),
+#            UnknownHandler().create(),
         ]
 
     def start(self):

@@ -3,6 +3,7 @@ import logging
 from telegram import Update
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters
 from filters import SentimentFilter
+from text_handlers import HelloTextHandler, EndTextHandler
 
 from deeppavlov import build_model, configs
 
@@ -117,3 +118,47 @@ class SentimentHandler(SuperHandler):
 
     def create(self) -> Handler:
         return MessageHandler(self.__filter, self._run_wrapper)
+
+
+class MainMessageHandler(SuperHandler):
+    """
+    Handler for intent detection
+    """
+    def __init__(self):
+        super().__init__()
+        self.__unknown_message = 'Я тебя не понял.'
+        self.__logger = logging.getLogger(__file__)
+        self.__text_handlers =[
+            HelloTextHandler(),
+            EndTextHandler()
+        ]
+
+    @property
+    def handler_name(self) -> str:
+        return 'main message'
+
+    def _run_handler(self, update: Update, callback_context: CallbackContext):
+        return_message = ''
+        logger_message = ''
+
+        for handler in self.__text_handlers:
+            handler_trigger, handler_message = handler.get(update.message.text)
+
+            if handler_trigger:
+                return_message += handler_message + ' '
+                logger_message += handler.handler_name + ', '
+
+        if len(return_message) > 0:
+            self.__logger.info(
+                f"Understood message from {update.effective_chat.id} ({update.effective_chat.username}). Found {logger_message[:-2]}."
+            )
+
+            callback_context.bot.send_message(chat_id=update.effective_chat.id, text=return_message)
+        else:
+            self.__logger.info(
+                f"Didn't understand message from {update.effective_chat.id} ({update.effective_chat.username})."
+            )
+            callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__unknown_message)
+
+    def create(self) -> Handler:
+        return MessageHandler(Filters.regex(r'.*'), self._run_wrapper)
