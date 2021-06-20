@@ -3,7 +3,7 @@ import logging
 from telegram import Update
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters
 from filters import SentimentFilter
-from text_handlers import HelloTextHandler, EndTextHandler
+from text_handlers import HelloTextHandler, EndTextHandler, WeatherTextHandler
 
 from deeppavlov import build_model, configs
 
@@ -128,8 +128,9 @@ class MainMessageHandler(SuperHandler):
         super().__init__()
         self.__unknown_message = 'Я тебя не понял.'
         self.__logger = logging.getLogger(__file__)
-        self.__text_handlers =[
+        self.__text_handlers = [
             HelloTextHandler(),
+            WeatherTextHandler(),
             EndTextHandler()
         ]
 
@@ -145,7 +146,7 @@ class MainMessageHandler(SuperHandler):
             handler_trigger, handler_message = handler.get(update.message.text)
 
             if handler_trigger:
-                return_message += handler_message + ' '
+                return_message += handler_message + (' ' if handler_message[-1] != '\n' else '')
                 logger_message += handler.handler_name + ', '
 
         if len(return_message) > 0:
