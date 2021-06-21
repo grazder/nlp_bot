@@ -31,7 +31,6 @@ class SuperTextHandler:
         raise NotImplementedError()
 
     def get(self, message: str) -> (bool, str):
-        print(self._lemmatize(message))
         tokens = ' '.join(self._lemmatize(message))
         trigger = any(word in tokens for word in self._handler_triggers)
 
