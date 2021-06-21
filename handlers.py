@@ -113,7 +113,7 @@ class SentimentHandler(SuperHandler):
         super().__init__(default_state)
 
         self.__message = 'Давай повежливее...'
-        model = build_model(configs.classifiers.rusentiment_bert, download=False)
+        model = build_model(configs.classifiers.rusentiment_bert, download=True)
         self.__filter = SentimentFilter(model)
 
     @property
