@@ -1,6 +1,7 @@
 from typing import List
 import pymorphy2
-from weather import Weather
+from features.weather import Weather
+from features.cat_facts import CatFactGenerator
 
 class SuperTextHandler:
     """
@@ -90,7 +91,7 @@ class WeatherTextHandler(SuperTextHandler):
 
     @property
     def handler_name(self) -> str:
-        return 'weather'
+        return 'features'
 
     @property
     def _handler_triggers(self) -> List[str]:
@@ -117,3 +118,23 @@ class BeerTextHandler(SuperTextHandler):
 
     def _get_message(self, message: str) -> str:
         return 'Какое пиво ты бы хотел?'
+
+
+class CatTextHandler(SuperTextHandler):
+    """
+    Handler for beer searcher
+    """
+    def __init__(self):
+        super().__init__()
+        self.__generator = CatFactGenerator()
+
+    @property
+    def handler_name(self) -> str:
+        return 'cat'
+
+    @property
+    def _handler_triggers(self) -> List[str]:
+        return ['кошка', 'кот', 'котенок', 'киска', 'котик']
+
+    def _get_message(self, message: str) -> str:
+        return 'Интересный факт про котика: ' + self.__generator.sample()

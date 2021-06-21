@@ -3,7 +3,7 @@ import logging
 from telegram import Update, InputMediaPhoto
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters, ConversationHandler
 from filters import SentimentFilter, HelloFilter
-from text_handlers import HelloTextHandler, EndTextHandler, WeatherTextHandler, BeerTextHandler
+from text_handlers import HelloTextHandler, EndTextHandler, WeatherTextHandler, BeerTextHandler, CatTextHandler
 from beer.src.beer_embedding import BeerEmbedding
 
 from deeppavlov import build_model, configs
@@ -143,6 +143,7 @@ class MainMessageHandler(SuperHandler):
         self.__text_handlers = [
             HelloTextHandler(),
             WeatherTextHandler(),
+            CatTextHandler(),
             BeerTextHandler(),
             EndTextHandler()
         ]
