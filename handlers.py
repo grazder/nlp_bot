@@ -157,7 +157,6 @@ class MainMessageHandler(SuperHandler):
         return 'main message'
 
     def _run_handler(self, update: Update, callback_context: CallbackContext):
-        return_message = ''
         logger_message = ''
 
         end_activated = False
