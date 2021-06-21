@@ -233,3 +233,26 @@ class BeerHandler(SuperHandler):
 
     def create(self) -> Handler:
         return MessageHandler(Filters.regex(r'.*'), self._run_wrapper)
+
+
+class HelpHandler(SuperHandler):
+    """
+    Handler for help messages
+    """
+    def __init__(self, default_state: int = 0):
+        super().__init__(default_state)
+
+        self.__message = 'Я могу говорить погоду, умею рекомендовать пиво, а еще знаю много интересных фактов про котиков! '
+        self.__message += 'Поздоровайся со мной, чтобы начать работу!'
+
+    @property
+    def handler_name(self) -> str:
+        return 'help'
+
+    def _run_handler(self, update: Update, callback_context: CallbackContext):
+        callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
+
+        return self._default_state
+
+    def create(self) -> Handler:
+        return CommandHandler('help', self._run_wrapper)

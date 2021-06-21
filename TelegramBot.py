@@ -10,16 +10,14 @@ from telegram.ext import (
 )
 import logging
 from typing import Dict, List
-from handlers import StartHandler, EndHandler, \
-    SentimentHandler, MainMessageHandler, \
-    BeerHandler
+from handlers import *
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
-MAIN, BEER = 0, 1
+MAIN, BEER, CAT = 0, 1, 2
 
 
 class TelegramBot:
@@ -31,9 +29,10 @@ class TelegramBot:
         handler = self.__init_handlers()
 
         self.__dispatcher.add_handler(handler)
+        self.__dispatcher.add_handler(HelpHandler().create())
 
     def __init_handlers(self) -> List[Handler]:
-        main_message_handler = MainMessageHandler()
+        main_message_handler = MainMessageHandler(MAIN, BEER)
         # sent_handler_main = SentimentHandler(MAIN)
         # sent_handler_beer = SentimentHandler(BEER)
 
@@ -43,12 +42,17 @@ class TelegramBot:
                 states={
                     MAIN: [
 #                        sent_handler_main.create(),
-                        main_message_handler.create()
+                        HelpHandler().create(),
+                        main_message_handler.create(),
                     ],
                     BEER: [
 #                        sent_handler_beer.create(),
-                        BeerHandler(MAIN).create()
-                    ]
+                        HelpHandler().create(),
+                        BeerHandler(MAIN).create(),
+                    ],
+                    # CAT: [
+                    #     CatHandler().create()
+                    # ]
                 },
                 fallbacks=[EndHandler().create()]
             )
