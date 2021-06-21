@@ -48,9 +48,11 @@ class BeerEmbedding:
             data[key] = data[key].apply(
                 lambda x: list(map(str.lower, x)) if x is not np.nan and x is not None else [])
         for name, row in data.iterrows():
-            features.append(self.featurize(row))
-            images.append(row['img'])
-            names.append(name.replace('-', ' '))
+            vec = self.featurize(row)
+            if vec.sum() > 15:
+                features.append(vec)
+                images.append(row['img'])
+                names.append(name.replace('-', ' '))
         features = np.vstack(features)
         self._features = features
         self._images = images

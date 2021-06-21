@@ -1,4 +1,5 @@
 import logging
+import os
 
 from telegram import Update, InputMediaPhoto
 from telegram.ext import CallbackContext, Handler, CommandHandler, RegexHandler, MessageHandler, Filters, ConversationHandler
@@ -161,23 +162,25 @@ class MainMessageHandler(SuperHandler):
 
         end_activated = False
         beer_activated = False
+        messages = []
 
         for handler in self.__text_handlers:
             handler_trigger, handler_message = handler.get(update.message.text)
 
             if handler_trigger:
-                return_message += handler_message + (' ' if handler_message[-1] != '\n' else '')
+                messages += [handler_message]
                 logger_message += handler.handler_name + ', '
 
-                end_activated = handler.handler_name == 'end'
-                beer_activated = handler.handler_name == 'beer'
+                end_activated = end_activated or handler.handler_name == 'end'
+                beer_activated = beer_activated or handler.handler_name == 'beer'
 
-        if len(return_message) > 0 and not(end_activated and beer_activated):
+        if len(logger_message) > 0 and not(end_activated and beer_activated):
             self.__logger.info(
                 f"Understood message from {update.effective_chat.id} ({update.effective_chat.username}). Found {logger_message[:-2]}."
             )
 
-            callback_context.bot.send_message(chat_id=update.effective_chat.id, text=return_message)
+            for message in messages:
+                callback_context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
             if end_activated:
                 return ConversationHandler.END
@@ -199,8 +202,6 @@ class MainMessageHandler(SuperHandler):
     def create_start(self) -> Handler:
         return MessageHandler(self.__hello_filter, self._run_wrapper)
 
-
-import os
 
 class BeerHandler(SuperHandler):
     """
