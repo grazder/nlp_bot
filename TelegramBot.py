@@ -10,12 +10,16 @@ from telegram.ext import (
 )
 import logging
 from typing import Dict, List
-from handlers import StartHandler, EndHandler, UnknownHandler, SentimentHandler, MainMessageHandler
+from handlers import StartHandler, EndHandler, \
+    SentimentHandler, MainMessageHandler, \
+    BeerHandler
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
+
+MAIN, BEER = 0, 1
 
 
 class TelegramBot:
@@ -24,19 +28,30 @@ class TelegramBot:
         self.__dispatcher = self.__updater.dispatcher
         self.__logger = logging.getLogger(__file__)
 
-        handlers = self.__init_handlers()
+        handler = self.__init_handlers()
 
-        for handler in handlers:
-            self.__dispatcher.add_handler(handler)
+        self.__dispatcher.add_handler(handler)
 
     def __init_handlers(self) -> List[Handler]:
-        return [
-            StartHandler().create(),
-            EndHandler().create(),
-#            SentimentHandler().create(),
-            MainMessageHandler().create(),
-#            UnknownHandler().create(),
-        ]
+        main_message_handler = MainMessageHandler()
+        # sent_handler = SentimentHandler()
+
+        return ConversationHandler(
+                entry_points=[StartHandler(MAIN).create(),
+                              main_message_handler.create_start()],
+                states={
+                    MAIN: [
+#                        sent_handler(MAIN).create(),
+                        main_message_handler.create()
+                    ],
+                    BEER: [
+#                        sent_handler(BEER).create(),
+                        BeerHandler(MAIN).create()
+                    ]
+                },
+                fallbacks=[EndHandler().create()]
+            )
+
 
     def start(self):
         self.__logger.info("Start the Bot...")

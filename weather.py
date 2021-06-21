@@ -15,6 +15,7 @@ class Weather:
         self.__ner = NER.load('weights/slovnet_ner_news_v1.tar')
         self.__ner.navec(self.__navec)
         self._morph = pymorphy2.MorphAnalyzer()
+        self.__default_city = 'Москва'
 
         self.__translate = {
             'Clear': 'Ясно☀️',
@@ -44,7 +45,7 @@ class Weather:
 
         spans = [x for x in markup.spans if x.type == 'LOC']
 
-        city = 'Москва'
+        city = self.__default_city
 
         if len(spans) > 0:
             city = message[spans[0].start: spans[0].stop]
@@ -70,7 +71,16 @@ class Weather:
                                   f'&units=metric&appid={OPEN_WEATHER_TOKEN}'
         current_weather = requests.get(current_weather_request).json()
 
-        lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
+        if 'coord' in current_weather.keys():
+            lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
+        else:
+            city_name = self.__default_city
+
+            current_weather_request = f'https://api.openweathermap.org/data/2.5/weather?q={city_name}' \
+                                      f'&units=metric&appid={OPEN_WEATHER_TOKEN}'
+            current_weather = requests.get(current_weather_request).json()
+
+            lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
 
         weather_forecast_request = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}' \
                                    f'&exclude=minutely,hourly&units=metric&appid={OPEN_WEATHER_TOKEN}'

@@ -69,7 +69,7 @@ class EndTextHandler(SuperTextHandler):
 
     @property
     def handler_name(self) -> str:
-        return 'bye'
+        return 'end'
 
     @property
     def _handler_triggers(self) -> List[str]:
@@ -98,3 +98,22 @@ class WeatherTextHandler(SuperTextHandler):
 
     def _get_message(self, message: str) -> str:
         return self.__weather.get_weather(message)
+
+
+class BeerTextHandler(SuperTextHandler):
+    """
+    Handler for beer searcher
+    """
+    def __init__(self):
+        super().__init__()
+
+    @property
+    def handler_name(self) -> str:
+        return 'beer'
+
+    @property
+    def _handler_triggers(self) -> List[str]:
+        return ['пиво', 'пивикс', 'пивчанский', 'пив', 'пиву']
+
+    def _get_message(self, message: str) -> str:
+        return 'Какое пиво ты бы хотел?'
