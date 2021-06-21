@@ -54,7 +54,9 @@ class HelloTextHandler(SuperTextHandler):
 
     @property
     def _handler_triggers(self) -> List[str]:
-        return ['привет', 'здарова', 'йоу']
+        return ['привет', 'здарова', 'йоу',
+                'здравствуй', 'здравствуйте', 'прив',
+                'здаров']
 
     def _get_message(self, message: str) -> str:
         return self.__message
@@ -91,7 +93,7 @@ class WeatherTextHandler(SuperTextHandler):
 
     @property
     def handler_name(self) -> str:
-        return 'features'
+        return 'weather'
 
     @property
     def _handler_triggers(self) -> List[str]:
