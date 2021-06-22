@@ -47,22 +47,43 @@ class Weather:
         spans = [x for x in markup.spans if x.type == 'LOC']
 
         if len(spans) > 0:
-            city = message[:spans[0].stop].split(' ')[-1]
+            city = message[:spans[0].stop].strip().split(' ')[-1]
             city = ' '.join(self.__upper_message(self.__lemmatize(city)))
 
             return city
 
         return None
 
+    def __get_day(self, message: str) -> int:
+        lemmatized_message = self.__lemmatize(message)
 
-    def __get_number(self, message):
-        return None
+        if 'сегодня' in lemmatized_message:
+            return 0
+        if 'завтра' in lemmatized_message:
+            return 1
+        if 'неделя' in lemmatized_message:
+            return 7
+
+        return 0
 
     def __get_translation(self, weather):
         if weather in self.__translate.keys():
             return self.__translate[weather]
         else:
             return weather
+
+    def __get_desctiption(self, i, forecast, datetime_now):
+        response = ''
+        day_temp = int(forecast['temp']['day'])
+        night_temp = int(forecast['temp']['night'])
+        weather = forecast['weather'][0]['main']
+        new_day = datetime_now + timedelta(days=i)
+
+        response += f'{datetime.strftime(new_day, "%d.%m.%Y")}📅 '
+        response += f'Температура днем: {day_temp}, ночью: {night_temp}, {self.__get_translation(weather)}\n'
+
+        return response
+
 
     def get_weather(self, message):
         city_name = self.__get_city(message)
@@ -84,18 +105,17 @@ class Weather:
                 case_city_name = self._morph.parse(city_name)[0].inflect({'loct'}).word.capitalize()
 
                 response += 'Прогноз погоды в ' + case_city_name + ':\n'
-                forecasts = []
                 datetime_now = datetime.now()
 
-                for i, forecast in enumerate(weather_forecast['daily']):
-                    day_temp = int(forecast['temp']['day'])
-                    night_temp = int(forecast['temp']['night'])
-                    weather = forecast['weather'][0]['main']
-                    new_day = datetime_now + timedelta(days=i)
+                day = self.__get_day(message)
 
-                    forecasts.append((day_temp, night_temp, weather))
-                    response += f'{datetime.strftime(new_day, "%d.%m.%Y")}📅 '
-                    response += f'Температура днем: {day_temp}, ночью: {night_temp}, {self.__get_translation(weather)}\n'
+                if day == 0:
+                    response += self.__get_desctiption(0, weather_forecast['daily'][0], datetime_now)
+                elif day == 1:
+                    response += self.__get_desctiption(1, weather_forecast['daily'][1], datetime_now)
+                elif day == 7:
+                    for i, forecast in enumerate(weather_forecast['daily']):
+                        response += self.__get_desctiption(i, forecast, datetime_now)
 
                 return response
 
