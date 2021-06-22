@@ -49,10 +49,7 @@ class TelegramBot:
 #                        sent_handler_beer.create(),
                         HelpHandler().create(),
                         BeerHandler(MAIN).create(),
-                    ],
-                    # CAT: [
-                    #     CatHandler().create()
-                    # ]
+                    ]
                 },
                 fallbacks=[EndHandler().create()]
             )

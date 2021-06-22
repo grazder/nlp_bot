@@ -48,7 +48,7 @@ class Weather:
         city = self.__default_city
 
         if len(spans) > 0:
-            city = message[spans[0].start: spans[0].stop]
+            city = message[:spans[0].stop].split(' ')[-1]
             city = ' '.join(self.__upper_message(self.__lemmatize(city)))
 
         return city

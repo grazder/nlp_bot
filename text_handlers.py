@@ -24,6 +24,10 @@ class SuperTextHandler:
         raise NotImplementedError()
 
     @property
+    def new_state(self) -> str:
+        raise False
+
+    @property
     def _handler_triggers(self) -> List[str]:
         raise NotImplementedError()
 
@@ -75,6 +79,10 @@ class EndTextHandler(SuperTextHandler):
         return 'end'
 
     @property
+    def new_state(self) -> str:
+        raise True
+
+    @property
     def _handler_triggers(self) -> List[str]:
         return ['пока', 'досвидание', 'поки',
                 'досвидания', 'прощай']
@@ -115,6 +123,10 @@ class BeerTextHandler(SuperTextHandler):
         return 'beer'
 
     @property
+    def new_state(self) -> str:
+        raise True
+
+    @property
     def _handler_triggers(self) -> List[str]:
         return ['пиво', 'пивикс', 'пивчанский', 'пив', 'пиву']
 
@@ -131,12 +143,16 @@ class CatTextHandler(SuperTextHandler):
         self.__generator = CatFactGenerator()
 
     @property
+    def new_state(self) -> str:
+        raise True
+
+    @property
     def handler_name(self) -> str:
         return 'cat'
 
     @property
     def _handler_triggers(self) -> List[str]:
-        return ['кошка', 'кот', 'котенок', 'киска', 'котик']
+        return ['кошка', 'кот', 'котенок', 'киска', 'котик', 'еще', 'ещё']
 
     def _get_message(self, message: str) -> str:
-        return 'Интересный факт про котика: ' + self.__generator.sample()
+        return 'Интересный факт про котиков: ' + self.__generator.sample()
