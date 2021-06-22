@@ -16,6 +16,7 @@ class Weather:
         self.__ner.navec(self.__navec)
         self._morph = pymorphy2.MorphAnalyzer()
         self.__default_city = 'Москва'
+        self.__unknown_message = 'Извини, но я не нашел такого города.'
 
         self.__translate = {
             'Clear': 'Ясно☀️',
@@ -45,13 +46,14 @@ class Weather:
 
         spans = [x for x in markup.spans if x.type == 'LOC']
 
-        city = self.__default_city
-
         if len(spans) > 0:
             city = message[:spans[0].stop].split(' ')[-1]
             city = ' '.join(self.__upper_message(self.__lemmatize(city)))
 
-        return city
+            return city
+
+        return None
+
 
     def __get_number(self, message):
         return None
@@ -65,41 +67,36 @@ class Weather:
     def get_weather(self, message):
         city_name = self.__get_city(message)
 
-        response = ''
-
-        current_weather_request = f'https://api.openweathermap.org/data/2.5/weather?q={city_name}' \
-                                  f'&units=metric&appid={OPEN_WEATHER_TOKEN}'
-        current_weather = requests.get(current_weather_request).json()
-
-        if 'coord' in current_weather.keys():
-            lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
-        else:
-            city_name = self.__default_city
+        if city_name is not None:
+            response = ''
 
             current_weather_request = f'https://api.openweathermap.org/data/2.5/weather?q={city_name}' \
                                       f'&units=metric&appid={OPEN_WEATHER_TOKEN}'
             current_weather = requests.get(current_weather_request).json()
 
-            lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
+            if 'coord' in current_weather.keys():
+                lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
 
-        weather_forecast_request = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}' \
-                                   f'&exclude=minutely,hourly&units=metric&appid={OPEN_WEATHER_TOKEN}'
-        weather_forecast = requests.get(weather_forecast_request).json()
+                weather_forecast_request = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}' \
+                                           f'&exclude=minutely,hourly&units=metric&appid={OPEN_WEATHER_TOKEN}'
+                weather_forecast = requests.get(weather_forecast_request).json()
 
-        case_city_name = self._morph.parse(city_name)[0].inflect({'loct'}).word.capitalize()
+                case_city_name = self._morph.parse(city_name)[0].inflect({'loct'}).word.capitalize()
 
-        response += 'Прогноз погоды в ' + case_city_name + ':\n'
-        forecasts = []
-        datetime_now = datetime.now()
+                response += 'Прогноз погоды в ' + case_city_name + ':\n'
+                forecasts = []
+                datetime_now = datetime.now()
 
-        for i, forecast in enumerate(weather_forecast['daily']):
-            day_temp = int(forecast['temp']['day'])
-            night_temp = int(forecast['temp']['night'])
-            weather = forecast['weather'][0]['main']
-            new_day = datetime_now + timedelta(days=i)
+                for i, forecast in enumerate(weather_forecast['daily']):
+                    day_temp = int(forecast['temp']['day'])
+                    night_temp = int(forecast['temp']['night'])
+                    weather = forecast['weather'][0]['main']
+                    new_day = datetime_now + timedelta(days=i)
 
-            forecasts.append((day_temp, night_temp, weather))
-            response += f'{datetime.strftime(new_day, "%d.%m.%Y")}📅 '
-            response += f'Температура днем: {day_temp}, ночью: {night_temp}, {self.__get_translation(weather)}\n'
+                    forecasts.append((day_temp, night_temp, weather))
+                    response += f'{datetime.strftime(new_day, "%d.%m.%Y")}📅 '
+                    response += f'Температура днем: {day_temp}, ночью: {night_temp}, {self.__get_translation(weather)}\n'
 
-        return response
+                return response
+
+        return self.__unknown_message
