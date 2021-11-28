@@ -5,7 +5,7 @@ import requests
 from typing import List
 from datetime import datetime, timedelta
 
-OPEN_WEATHER_TOKEN = "OPEN_WEATHER_TOKEN"
+OPEN_WEATHER_TOKEN = "c12f3508c8b31dd8f73c97b2422d5168"
 
 
 class Weather:
