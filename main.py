@@ -1,5 +1,6 @@
 from TelegramBot import TelegramBot
 
+
 def main() -> None:
     bot = TelegramBot()
     bot.start()

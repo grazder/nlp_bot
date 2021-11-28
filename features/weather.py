@@ -96,7 +96,7 @@ class Weather:
                 lon, lat = current_weather['coord']['lon'], current_weather['coord']['lat']
 
                 weather_forecast_request = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}' \
-                                           f'&exclude=minutely,hourly&units=metric&appid={OPEN_WEATHER_TOKEN}'
+                                           f'&exclude=minutely,hourly&units=metric&appid={os.environ["OPEN_WEATHER_TOKEN"]}'
                 weather_forecast = requests.get(weather_forecast_request).json()
 
                 case_city_name = self._morph.parse(city_name)[0].inflect({'loct'}).word.capitalize()
