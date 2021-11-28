@@ -11,6 +11,9 @@ from telegram.ext import (
 import logging
 from typing import Dict, List
 from handlers import *
+import os
+
+PORT = int(os.environ.get('PORT', 5000))
 
 # Enable logging
 logging.basicConfig(
@@ -22,7 +25,8 @@ MAIN, BEER, CAT = 0, 1, 2
 
 class TelegramBot:
     def __init__(self, token):
-        self.__updater = Updater(token)
+        self.__token = token
+        self.__updater = Updater(self.__token)
         self.__dispatcher = self.__updater.dispatcher
         self.__logger = logging.getLogger(__file__)
 
@@ -33,20 +37,20 @@ class TelegramBot:
 
     def __init_handlers(self) -> List[Handler]:
         main_message_handler = MainMessageHandler(MAIN, BEER)
-        # sent_handler_main = SentimentHandler(MAIN)
-        # sent_handler_beer = SentimentHandler(BEER)
+        sent_handler_main = SentimentHandler(MAIN)
+        sent_handler_beer = SentimentHandler(BEER)
 
         return ConversationHandler(
                 entry_points=[StartHandler(MAIN).create(),
                               main_message_handler.create_start()],
                 states={
                     MAIN: [
-#                        sent_handler_main.create(),
+                        sent_handler_main.create(),
                         HelpHandler().create(),
                         main_message_handler.create(),
                     ],
                     BEER: [
-#                        sent_handler_beer.create(),
+                        sent_handler_beer.create(),
                         HelpHandler().create(),
                         BeerHandler(MAIN).create(),
                     ]
@@ -54,8 +58,11 @@ class TelegramBot:
                 fallbacks=[EndHandler().create()]
             )
 
-
     def start(self):
         self.__logger.info("Start the Bot...")
-        self.__updater.start_polling()
+        # self.__updater.start_polling()
+        self.__updater.start_webhook(listen="0.0.0.0",
+                                     port=int(PORT),
+                                     url_path=self.__token)
+        self.__updater.bot.setWebhook('https://nlp-pivo-bot.herokuapp.com/' + self.__token)
         self.__updater.idle()
