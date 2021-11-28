@@ -37,8 +37,8 @@ class TelegramBot:
 
     def __init_handlers(self) -> List[Handler]:
         main_message_handler = MainMessageHandler(MAIN, BEER)
-        sent_handler_main = SentimentHandler(MAIN)
-        sent_handler_beer = SentimentHandler(BEER)
+        # sent_handler_main = SentimentHandler(MAIN)
+        # sent_handler_beer = SentimentHandler(BEER)
 
         return ConversationHandler(
                 entry_points=[StartHandler(MAIN).create(),
