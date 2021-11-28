@@ -7,7 +7,7 @@ from filters import SentimentFilter, HelloFilter
 from text_handlers import HelloTextHandler, EndTextHandler, WeatherTextHandler, BeerTextHandler, CatTextHandler
 from beer.src.beer_embedding import BeerEmbedding
 
-from deeppavlov import build_model, configs
+# from deeppavlov import build_model, configs
 
 
 class SuperHandler:
@@ -105,28 +105,28 @@ class UnknownHandler(SuperHandler):
         return MessageHandler(Filters.regex(r'.*'), self._run_wrapper)
 
 
-class SentimentHandler(SuperHandler):
-    """
-    Handler for toxic messages
-    """
-    def __init__(self, default_state: int = 0):
-        super().__init__(default_state)
-
-        self.__message = 'Давай повежливее...'
-        model = build_model(configs.classifiers.rusentiment_bert, download=True)
-        self.__filter = SentimentFilter(model)
-
-    @property
-    def handler_name(self) -> str:
-        return 'sentiment'
-
-    def _run_handler(self, update: Update, callback_context: CallbackContext):
-        callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
-
-        return self._default_state
-
-    def create(self) -> Handler:
-        return MessageHandler(self.__filter, self._run_wrapper)
+# class SentimentHandler(SuperHandler):
+#     """
+#     Handler for toxic messages
+#     """
+#     def __init__(self, default_state: int = 0):
+#         super().__init__(default_state)
+#
+#         self.__message = 'Давай повежливее...'
+#         model = build_model(configs.classifiers.rusentiment_bert, download=True)
+#         self.__filter = SentimentFilter(model)
+#
+#     @property
+#     def handler_name(self) -> str:
+#         return 'sentiment'
+#
+#     def _run_handler(self, update: Update, callback_context: CallbackContext):
+#         callback_context.bot.send_message(chat_id=update.effective_chat.id, text=self.__message)
+#
+#         return self._default_state
+#
+#     def create(self) -> Handler:
+#         return MessageHandler(self.__filter, self._run_wrapper)
 
 
 class MainMessageHandler(SuperHandler):
