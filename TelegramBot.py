@@ -1,19 +1,7 @@
-from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove, InputMediaPhoto
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-    MessageHandler,
-    Filters,
-    ConversationHandler,
-    CallbackContext,
-    Handler
-)
-import logging
-from typing import Dict, List
+from telegram.ext import Updater
+from typing import List
 from handlers import *
 import os
-
-PORT = int(os.environ.get('PORT', 5000))
 
 # Enable logging
 logging.basicConfig(
@@ -24,9 +12,8 @@ MAIN, BEER, CAT = 0, 1, 2
 
 
 class TelegramBot:
-    def __init__(self, token):
-        self.__token = token
-        self.__updater = Updater(self.__token)
+    def __init__(self):
+        self.__updater = Updater(os.environ['TELEGRAM_TOKEN'])
         self.__dispatcher = self.__updater.dispatcher
         self.__logger = logging.getLogger(__file__)
 
@@ -61,8 +48,4 @@ class TelegramBot:
     def start(self):
         self.__logger.info("Start the Bot...")
         self.__updater.start_polling()
-        # self.__updater.start_webhook(listen="0.0.0.0",
-        #                              port=int(PORT),
-        #                              url_path=self.__token)
-        # self.__updater.bot.setWebhook('https://nlp-pivo-bot.herokuapp.com/' + self.__token)
         self.__updater.idle()

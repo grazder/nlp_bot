@@ -1,3 +1,4 @@
+import os
 from navec import Navec
 from slovnet import NER
 import pymorphy2
@@ -5,12 +6,9 @@ import requests
 from typing import List
 from datetime import datetime, timedelta
 
-OPEN_WEATHER_TOKEN = "c12f3508c8b31dd8f73c97b2422d5168"
-
 
 class Weather:
-    def __init__(self, token=OPEN_WEATHER_TOKEN):
-        self.__token = token
+    def __init__(self):
         self.__navec = Navec.load('weights/navec_news_v1_1B_250K_300d_100q.tar')
         self.__ner = NER.load('weights/slovnet_ner_news_v1.tar')
         self.__ner.navec(self.__navec)
@@ -84,7 +82,6 @@ class Weather:
 
         return response
 
-
     def get_weather(self, message):
         city_name = self.__get_city(message)
 
@@ -92,7 +89,7 @@ class Weather:
             response = ''
 
             current_weather_request = f'https://api.openweathermap.org/data/2.5/weather?q={city_name}' \
-                                      f'&units=metric&appid={OPEN_WEATHER_TOKEN}'
+                                      f'&units=metric&appid={os.environ["OPEN_WEATHER_TOKEN"]}'
             current_weather = requests.get(current_weather_request).json()
 
             if 'coord' in current_weather.keys():

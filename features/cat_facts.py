@@ -1,6 +1,5 @@
 import requests
 from googletrans import Translator
-
 from httpcore._exceptions import ConnectError
 
 
