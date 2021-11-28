@@ -45,12 +45,12 @@ class TelegramBot:
                               main_message_handler.create_start()],
                 states={
                     MAIN: [
-                        sent_handler_main.create(),
+                        # sent_handler_main.create(),
                         HelpHandler().create(),
                         main_message_handler.create(),
                     ],
                     BEER: [
-                        sent_handler_beer.create(),
+                        # sent_handler_beer.create(),
                         HelpHandler().create(),
                         BeerHandler(MAIN).create(),
                     ]
