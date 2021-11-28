@@ -60,7 +60,7 @@ class TelegramBot:
 
     def start(self):
         self.__logger.info("Start the Bot...")
-        self.__updater.start_polling(none_stop=True)
+        self.__updater.start_polling()
         # self.__updater.start_webhook(listen="0.0.0.0",
         #                              port=int(PORT),
         #                              url_path=self.__token)
