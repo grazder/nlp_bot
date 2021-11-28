@@ -44,6 +44,6 @@ def get_data():
     download_file_from_google_drive(id_, 'beer_data.zip')
 
     with zipfile.ZipFile('beer_data.zip', 'r') as zip_:
-        zip_.extractall()
+        zip_.extractall('beer')
 
     os.remove('beer_data.zip')
