@@ -3,6 +3,7 @@ import pymorphy2
 from features.weather import Weather
 from features.cat_facts import CatFactGenerator
 
+
 class SuperTextHandler:
     """
     Abstract handler
